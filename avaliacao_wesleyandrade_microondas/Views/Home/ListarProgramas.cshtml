@@ -1,0 +1,71 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Programas Cadastrados";
+}
+
+@model List<avaliacao_wesleyandrade_microondas.Models.Programa>
+
+<br />
+<label>GERENCIAMENTO DE PROGRAMAS</label>
+<br />
+
+<form id="buscarprograma" action="/Home/BuscarProgramas" method="POST" class="form-group">
+
+    <input type="text" name="busca" id="busca" placeholder="Busque pelo nome" size="70">
+
+    <button name="btnBuscarProgram" id="btnBuscarProgram" class="btn btn-success" type="submit">
+        BUSCAR
+    </button>
+
+</form>
+
+@if (Model != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Nome</th>
+                <th scope="col">Instruções</th>
+                <th scope="col">Potência</th>
+                <th scope="col">Tempo</th>
+                <th scope="col">Caractere</th>
+                <th scope="col">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+           
+            @foreach (avaliacao_wesleyandrade_microondas.Models.Programa p in Model)
+            {
+                <tr>
+
+                    <td> @p.nome </td>
+                    <td> @p.instrucoes </td>
+                    <td> @p.potencia </td>
+                    <td> @p.tempo </td>
+                    <td> @p.caractere </td>
+                    <td> <a href="/Home/ExcluirPrograma/@Model.IndexOf(p)">Excluir</a> </td>
+                </tr>
+
+                
+            }
+        </tbody>
+    </table>
+}
+
+
+
+<br />
+<a href="/Home/Index" class="btn btn-warning">Voltar</a>
+
+@if (ViewBag.erro_exclusao != null)
+{
+    String erro_exc = ViewBag.erro_exclusao;
+
+    if (erro_exc.Length > 0)
+    {
+        <br /><br />
+        <label> ERRO: @erro_exc</label>
+    }
+}
+
+

@@ -1,0 +1,76 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Novo Programa";
+}
+
+<br />
+<label>CADASTRO DE NOVO PROGRAMA</label>
+<br />
+
+<form id="programa" action="/Home/NovoPrograma" method="POST" class="form-group">
+
+    <label> Nome: </label>
+    <br />
+    <input type="text" name="nome" id="nome">
+    <br /><br />
+
+
+    <label> Instruções: </label>
+    <br />
+    <textarea id="instrucoes" name="instrucoes" rows="2" cols="70" /></textarea>
+    <br /><br />
+
+    <label> Tempo (Segundos): </label>
+    <br />
+    <input type="text" id="tempo" name="tempo" onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+    <br /><br />
+
+    <label> Potência: </label>
+    <br />
+    <input type="text" id="potencia" name="potencia" onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+    <br /><br />
+
+    <label> Caractere de Aquecimento: </label>
+    <br />
+    <input type="text" id="caractere" name="caractere" maxlength="1">
+    <br /><br />
+
+
+
+    <br />
+
+    <button name="btnEnviarProgram" id="btnEnviarProgram" class="btn btn-success" type="submit">
+        CADASTRAR
+    </button>
+
+    <a href="/Home/Index" class="btn btn-warning">Voltar</a>
+
+</form>
+
+<br />
+<br />
+
+@if (ViewBag.erros_new_program != null)
+{
+    List<String> erros = (List<String>)ViewBag.erros_new_program;
+
+    int k = 0;
+    while (erros != null && k < erros.Count())
+    {
+        if (k == 0)
+        {
+            <label>ERROS:</label>
+            <br />
+            <br />
+        }
+
+        <label>- @erros.ElementAt(k)</label>
+        <br />
+
+
+        k++;
+    }
+}
+
+
+

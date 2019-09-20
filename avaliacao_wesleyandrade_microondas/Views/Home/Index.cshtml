@@ -1,0 +1,189 @@
+﻿@using avaliacao_wesleyandrade_microondas.Models;
+@{
+    ViewBag.Title = "Início";
+
+}
+
+<br />
+<label>MICRO-ONDAS DIGITAL</label>
+<br />
+
+<form id="comandos" action="/Home/Index" method="POST" class="form-group">
+
+    <input type="text" name="txtComandos" id="txtComandos" class="form-control" value="" placeholder="Insira os comandos para uso do Micro-Ondas">
+    <br />
+
+    <button name="btnEnviar" id="btnEnviar" class="btn btn-success" type="submit">
+        PLAY
+    </button>
+
+</form>
+
+
+
+
+<button name="btnPause" id="btnPause" onclick="pause()" class="btn btn-warning" disabled>
+    PAUSE
+</button>
+
+<button name="btnResume" id="btnResume" onclick="resume()" class="btn btn-primary" disabled>
+    RESUME
+</button>
+
+<button name="btnCancel" id="btnCancel" onclick="cancel()" class="btn btn-danger" disabled>
+    CANCEL
+</button>
+
+<br /><br />
+<a href="/HOME/NovoPrograma" class="btn btn-primary">New Program</a>
+<a href="/HOME/ListarProgramas" class="btn btn-info">List Program</a>
+<br />
+
+
+<br />
+<b><label>INSTRUÇÕES:</label></b>
+<br />
+<u>Comandos Disponíveis </u>
+<br />
+Tempo = time
+<br />
+Potência = pot
+<br />
+Início Rápido = quick (Sobrepõe outros comandos)
+<br />
+Programas = program nomeprograma (Sobrepõe outros comandos, inclusive quick)
+<br />
+<br />
+
+<u>Exemplos de uso:</u>
+<br />
+time 00:37, pot 8 (Vários comandos, separar por vírgula)
+<br />
+time 01:00        (Único comando)
+<br />
+program Carne
+<br />
+quick
+
+
+
+@if (ViewBag.erros != null)
+{
+    <br />
+    <br />
+    <b><label>ERROS:</label></b>
+    List<String> erros = ViewBag.erros;
+
+    for (int i = 0; i < erros.Count; i++)
+    {
+        <br />
+        <label>- @erros.ElementAt(i)</label>
+    }
+
+}
+else
+{
+    String entrada = "";
+    if (ViewBag.entrada != null)
+    {
+        entrada = (String)ViewBag.entrada;
+    }
+
+
+
+    if (Session["estado"] != null && Session["estado"].Equals("aquecendo")) // esta em processo de aquecimento, já foi dado o play
+    {
+        Microondas m = (Microondas)Session["microondas"];
+        int tempo = (m.minutos * 60) + m.segundos;
+        int pot = m.potencia;
+        char caractere = '.';
+
+        if (m.programa_selecionado > -1)
+        {
+            caractere = m.programas.ElementAt(m.programa_selecionado).caractere;
+        }
+
+
+
+        List<Programa> programas = m.programas;
+        Session["estado"] = "aguardando comando";
+        m = new Microondas(0, 0, 0, false, "", programas, -1); // zera microondas para novas solicitações, mantendo apenas os programas
+        Session["microondas"] = m;
+
+
+        <script type="text/javascript">
+            document.getElementById('btnPause').disabled = false;
+            document.getElementById('btnCancel').disabled = false;
+
+
+            document.getElementById('txtComandos').value = '@entrada'; // exibindo comandos que foram digitados na requisição
+
+            var time = @tempo;
+            var pot_ = @pot;
+            var aux = setInterval(progresso, 1000);
+
+            function progresso() {
+                progresso2(time,pot_);
+                time--;
+            }
+
+            function progresso2(time,pot_)
+            {
+                if (time > 0) // ainda está em processo de aquecimento
+                {
+                    for (var i = 0; i < pot_; i++)
+                    {
+                        document.getElementById('txtComandos').value = document.getElementById('txtComandos').value + '@caractere';
+                    }
+
+                }
+                else // acabou o aquecimento
+                {
+                    document.getElementById('txtComandos').value = "aquecida";
+                    clearInterval(aux);
+
+                    document.getElementById('btnPause').disabled = true;
+                    document.getElementById('btnResume').disabled = true;
+                    document.getElementById('btnCancel').disabled = true;
+                }
+
+            }
+
+            function cancel()
+            {
+                document.getElementById('btnPause').disabled = true;
+                document.getElementById('btnResume').disabled = true;
+                document.getElementById('btnCancel').disabled = true;
+                document.getElementById('txtComandos').value = "cancelado";
+                clearInterval(aux);
+
+            }
+
+            function pause()
+            {
+                
+                document.getElementById('btnPause').disabled = true;
+                document.getElementById('btnResume').disabled = false;
+                document.getElementById('btnCancel').disabled = false;
+                clearInterval(aux);
+            }
+
+            function resume() {
+                document.getElementById('btnPause').disabled = false;
+                document.getElementById('btnCancel').disabled = false;
+                document.getElementById('btnResume').disabled = true;
+                aux = setInterval(progresso, 1000);
+            }
+
+
+        </script>
+    }
+
+
+}
+
+
+
+
+
+
